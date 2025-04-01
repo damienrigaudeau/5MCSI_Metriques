@@ -45,7 +45,7 @@ def graph_commits():
 @app.route('/commits-data/')
 def commits_data():
     try:
-        url = 'https://api.github.com/repos/Makrix78/5MCSI_Metriques/commits'
+        url = 'https://api.github.com/repos/damienrigaudeau/5MCSI_Metriques/commits'
         response = urlopen(url)
         raw_data = response.read()
         data = json.loads(raw_data.decode('utf-8'))
