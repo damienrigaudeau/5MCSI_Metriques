@@ -2,7 +2,6 @@ from flask import Flask, render_template, jsonify, json
 from datetime import datetime
 from urllib.request import urlopen
 import sqlite3
-import requests
 
 app = Flask(__name__)
 
@@ -43,9 +42,10 @@ def extract_minutes(date_string):
 
 @app.route('/commits/')
 def commits_page():
-    # Appel à l'API GitHub pour récupérer les commits
-    response = requests.get("https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits")
-    commits_data = response.json()
+    # Appel à l'API GitHub via urlopen
+    response = urlopen("https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits")
+    raw_data = response.read()
+    commits_data = json.loads(raw_data.decode('utf-8'))
     
     # Agrégation des commits par minute
     commit_minutes = {}
@@ -57,7 +57,7 @@ def commits_page():
     # Préparation des données pour le graphique : liste de paires [minute, nombre_de_commits]
     graph_data = sorted([[minute, count] for minute, count in commit_minutes.items()], key=lambda x: x[0])
     
-    # Les données seront injectées dans le template commits.html pour affichage du graphique
+    # Les données sont passées au template commits.html pour l'affichage du graphique
     return render_template('commits.html', data=graph_data)
 
 if __name__ == "__main__":
