@@ -35,6 +35,34 @@ def mongraphique():
 @app.route("/histogramme/")
 def exercice4():
     return render_template("histogramme.html")
+
+@app.route('/commits/')
+def commits_page():
+    return render_template('commits.html')
+
+import requests
+from datetime import datetime
+from flask import jsonify
+
+@app.route('/api/commits-data/')
+def commits_data():
+    url = 'https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits'
+    response = requests.get(url)
+    commits = response.json()
+
+    commit_minutes = {}
+
+    for commit in commits:
+        try:
+            date_str = commit['commit']['author']['date']
+            dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            minute = dt.minute
+            commit_minutes[minute] = commit_minutes.get(minute, 0) + 1
+        except Exception as e:
+            print("Erreur de parsing :", e)
+
+    return jsonify(commit_minutes)
+
   
 if __name__ == "__main__":
   app.run(debug=True)
