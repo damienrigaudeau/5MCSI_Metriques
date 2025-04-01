@@ -4,6 +4,9 @@ from flask import json
 from datetime import datetime
 from urllib.request import urlopen
 import sqlite3
+import requests
+from datetime import datetime
+from flask import jsonify
                                                                                                                                        
 app = Flask(__name__)                                                                                                                  
                                                                                                                                        
@@ -40,6 +43,24 @@ def exercice4():
 def commits_page():
     return render_template('commits.html')
 
+@app.route('/api/commits-data/')
+def commits_data():
+    url = 'https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits'
+    response = requests.get(url)
+    commits = response.json()
+
+    commit_minutes = {}
+
+    for commit in commits:
+        try:
+            date_str = commit['commit']['author']['date']
+            dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            minute = dt.minute
+            commit_minutes[minute] = commit_minutes.get(minute, 0) + 1
+        except Exception as e:
+            print("Erreur de parsing :", e)
+
+    return jsonify(commit_minutes)
   
 if __name__ == "__main__":
   app.run(debug=True)
