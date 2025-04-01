@@ -21,5 +21,21 @@
 
     <button type="submit">Envoyer</button>
   </form>
+
+  <p id="confirmation-message" style="display:none; color:green; text-align:center; font-weight:bold; margin-top:10px;">
+    Formulaire envoyé !
+  </p>
+
+  <script>
+    const form = document.querySelector('.contact-form');
+    const confirmationMessage = document.getElementById('confirmation-message');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault(); // Stop l'envoi du formulaire
+      confirmationMessage.style.display = 'block';
+      form.reset(); // Vide les champs
+    });
+  </script>
 </body>
+
 </html>
