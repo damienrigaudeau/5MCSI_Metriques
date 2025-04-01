@@ -1,38 +1,116 @@
-<html>
+<!DOCTYPE html>
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <title>Histogramme des Commits</title>
+    <title>Analyse des Commits GitHub</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {packages: ['corechart']});
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #eef1f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 50px auto;
+        background-color: white;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+      }
+
+      p.description {
+        text-align: center;
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 40px;
+        line-height: 1.6;
+      }
+
+      #chart_div {
+        width: 100%;
+        height: 500px;
+      }
+
+      footer {
+        text-align: center;
+        color: #aaa;
+        font-size: 14px;
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Analyse des Commits GitHub (par minute)</h1>
+
+      <p class="description">
+        Ce graphique représente le nombre de commits réalisés sur le projet
+        <strong>OpenRSI/5MCSI_Metriques</strong>, répartis selon les minutes de l'heure (de 00 à 59).
+        Cette visualisation permet d’observer les pics d'activité des contributeurs minute par minute.
+      </p>
+
+      <div id="chart_div"></div>
+
+      <footer>
+        Données récupérées via l’API GitHub – Projet pédagogique 5MCSI
+      </footer>
+    </div>
+
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart);
-      
+
       function drawChart() {
-        // Les données sont injectées depuis Flask dans une variable JavaScript
-        var commitData = {{ data|tojson }};
-        
-        var dataTable = new google.visualization.DataTable();
-        dataTable.addColumn('number', 'Minute');
-        dataTable.addColumn('number', 'Nombre de Commits');
-        
-        commitData.forEach(function(row) {
-          dataTable.addRow([row[0], row[1]]);
-        });
-        
-        var options = {
-          title: 'Nombre de Commits par Minute',
-          hAxis: { title: 'Minute' },
-          vAxis: { title: 'Commits' },
-          legend: 'none'
-        };
-        
-        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-        chart.draw(dataTable, options);
+        fetch('/commits-data/')
+          .then(response => response.json())
+          .then(data => {
+            const dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Minute');
+            dataTable.addColumn('number', 'Commits');
+
+            data.results.forEach(entry => {
+              dataTable.addRow([entry.minute.toString().padStart(2, '0'), entry.commits]);
+            });
+
+            const options = {
+              title: 'Nombre de commits par minute',
+              titleTextStyle: {
+                fontSize: 18,
+                bold: true,
+                color: '#2c3e50'
+              },
+              hAxis: {
+                title: 'Minute (00 à 59)',
+                slantedText: true,
+                titleTextStyle: { bold: true, italic: false, color: '#34495e' },
+                textStyle: { fontSize: 12 }
+              },
+              vAxis: {
+                title: 'Commits',
+                titleTextStyle: { bold: true, italic: false, color: '#34495e' },
+                minValue: 0,
+                gridlines: { count: 5 }
+              },
+              legend: 'none',
+              colors: ['#3498db'],
+              bar: { groupWidth: '75%' },
+              backgroundColor: 'transparent'
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+          });
       }
     </script>
-  </head>
-  <body>
-    <h2>Histogramme des Commits</h2>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
   </body>
 </html>
