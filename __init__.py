@@ -1,13 +1,13 @@
-import requests
+from flask import Flask, render_template_string, render_template, jsonify
+from flask import render_template
+from flask import json
 from datetime import datetime
-from flask import Flask, jsonify, render_template
+from urllib.request import urlopen
+import sqlite3
                                                                                                          
 app = Flask(__name__)    
 
-def extract_minutes(date_string):
-    date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-    return date_object.minute
-                                                                                                                                       
+                                                                                                     
 @app.route('/')
 def hello_world():
     return render_template('hello.html')
@@ -36,29 +36,10 @@ def mongraphique():
 @app.route("/histogramme/")
 def exercice4():
     return render_template("histogramme.html")
-
+  
 @app.route('/commits/')
-def commits():
-    # Appel à l'API GitHub
-    response = requests.get("https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits")
-    commit_data = response.json()
-
-    # Agrégation des commits par minute
-    commit_minutes = {}
-    for commit in commit_data:
-        date_str = commit['commit']['author']['date']
-        minute = extract_minutes(date_str)
-        commit_minutes[minute] = commit_minutes.get(minute, 0) + 1
-
-    # Préparation des données pour le graphique
-    # On crée une liste de listes : [[minute, nombre_de_commits], ...]
-    graph_data = sorted([[minute, count] for minute, count in commit_minutes.items()], key=lambda x: x[0])
-
-    # Optionnel : Si tu préfères renvoyer les données au format JSON, tu peux le faire directement
-    # return jsonify(commits=graph_data)
-
-    # Sinon, passe les données à un template HTML pour générer le graphique
-    return render_template("commits.html", data=graph_data)
+ def commits_page():
+     return render_template('commits.html')
   
 if __name__ == "__main__":
   app.run(debug=True)
