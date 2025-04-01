@@ -36,38 +36,35 @@ def mongraphique():
 def exercice4():
     return render_template("histogramme.html")
 
-def extract_minutes(date_string):
-    """
-    Extrait la minute à partir d'une date au format ISO 8601 (ex: "2024-02-11T11:57:27Z").
-    """
-    date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-    return date_object.minute
-
 @app.route('/commits/')
-def commits_page():
+def graph_commits():
+    return render_template('commits.html')
+
+# Route qui fournit les données JSON des commits
+from urllib.request import Request  # à ajouter en haut si pas encore là
+
+@app.route('/commits-data/')
+def commits_data():
     try:
-        # Appel à l'API GitHub via urlopen
-        response = urlopen("https://api.github.com/repos/OpenRSI/Exo_Java_BDD_2023")
+        token = "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"
+        headers = {'Authorization': f'token {token}'}
+        req = Request('https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits', headers=headers)
+        response = urlopen(req)
         raw_data = response.read()
-        commits_data = json.loads(raw_data.decode('utf-8'))
-        
-        # Agrégation des commits par minute
-        commit_minutes = {}
-        for commit in commits_data:
-            # Vérifier que la clé existe bien
-            date_str = commit.get('commit', {}).get('author', {}).get('date')
-            if date_str:
-                minute = extract_minutes(date_str)
-                commit_minutes[minute] = commit_minutes.get(minute, 0) + 1
-        
-        # Préparation des données pour le graphique : liste de paires [minute, nombre_de_commits]
-        graph_data = sorted([[minute, count] for minute, count in commit_minutes.items()], key=lambda x: x[0])
-        
-        # Passage des données au template commits.html
-        return render_template('commits.html', data=graph_data)
+        data = json.loads(raw_data.decode('utf-8'))
+
+        minute_counts = {}
+        for commit in data:
+            date_str = commit['commit']['author']['date']
+            date_object = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            minute = date_object.minute
+            minute_counts[minute] = minute_counts.get(minute, 0) + 1
+
+        results = [{'minute': minute, 'commits': count} for minute, count in sorted(minute_counts.items())]
+        return jsonify(results=results)
+
     except Exception as e:
-        # Retourne l'erreur pour déboguer
-        return f"Erreur lors du traitement des commits : {e}", 500
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
