@@ -2,47 +2,41 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Histogramme des températures</title>
+    <title>Histogramme Températures</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   </head>
   <body>
     <h2>Histogramme des températures - Tawarano</h2>
-    <div id="hist_div" style="width: 900px; height: 500px;"></div>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
 
     <script type="text/javascript">
-      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(drawHistogram);
 
       function drawHistogram() {
-        function drawChart(data) {
-          var dataTable = new google.visualization.DataTable();
-          dataTable.addColumn('string', 'Date');
-          dataTable.addColumn('number', 'Température (°C)');
-
-          data.results.forEach(entry => {
-            var date = new Date(entry.Jour * 1000);
-            dataTable.addRow([date.toLocaleDateString(), entry.temp]);
-          });
-
-          var options = {
-            title: 'Histogramme des températures de Tawarano',
-            legend: { position: 'none' },
-            hAxis: {
-              title: 'Date'
-            },
-            vAxis: {
-              title: 'Température (°C)'
-            }
-          };
-
-          var chart = new google.visualization.ColumnChart(document.getElementById('hist_div'));
-          chart.draw(dataTable, options);
-        }
-
-        fetch('/tawarano/')
+        fetch("/tawarano/")
           .then(response => response.json())
           .then(data => {
-            drawChart(data);
+            const rawData = data.results;
+
+            // Conversion en format lisible par Google Charts
+            const chartData = [['Date', 'Température (°C)']];
+            rawData.forEach(entry => {
+              const date = new Date(entry.Jour * 1000);
+              chartData.push([date.toLocaleDateString(), entry.temp]);
+            });
+
+            const dataTable = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+              title: "Histogramme des températures à Tawarano",
+              legend: { position: "none" },
+              hAxis: { title: "Date" },
+              vAxis: { title: "Température (°C)" }
+            };
+
+            const chart = new google.visualization.Histogram(document.getElementById("chart_div"));
+            chart.draw(dataTable, options);
           });
       }
     </script>
