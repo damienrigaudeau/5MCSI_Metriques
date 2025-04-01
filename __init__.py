@@ -47,7 +47,7 @@ def extract_minutes(date_string):
 def commits_page():
     try:
         # Appel à l'API GitHub via urlopen
-        response = urlopen("https://api.github.com/repos/OpenRSI/OpenRSI/Exo_Java_BDD_2023")
+        response = urlopen("https://api.github.com/repos/OpenRSI/Exo_Java_BDD_2023")
         raw_data = response.read()
         commits_data = json.loads(raw_data.decode('utf-8'))
         
