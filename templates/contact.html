@@ -7,35 +7,38 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
 </head>
 <body>
-  <form class="contact-form">
-    <h2>Contactez-moi</h2>
+  <div class="form-wrapper">
+    <form class="contact-form">
+      <h2>Contactez-moi</h2>
 
-    <label for="prenom">Prénom :</label>
-    <input type="text" id="prenom" name="prenom" placeholder="Entrez votre prénom" />
+      <label for="prenom">Prénom :</label>
+      <input type="text" id="prenom" name="prenom" placeholder="Entrez votre prénom" />
 
-    <label for="nom">Nom :</label>
-    <input type="text" id="nom" name="nom" placeholder="Entrez votre nom" />
+      <label for="nom">Nom :</label>
+      <input type="text" id="nom" name="nom" placeholder="Entrez votre nom" />
 
-    <label for="message">Message :</label>
-    <textarea id="message" name="message" rows="5" placeholder="Votre message..."></textarea>
+      <label for="message">Message :</label>
+      <textarea id="message" name="message" rows="5" placeholder="Votre message..."></textarea>
 
-    <button type="submit">Envoyer</button>
-  </form>
+      <button type="submit">Envoyer</button>
+    </form>
 
-  <p id="confirmation-message" style="display:none; color:green; text-align:center; font-weight:bold; margin-top:10px;">
-    Formulaire envoyé !
-  </p>
+    <div id="confirmation-message" class="confirmation-message">
+      Formulaire envoyé !
+    </div>
+  </div>
 
   <script>
     const form = document.querySelector('.contact-form');
     const confirmationMessage = document.getElementById('confirmation-message');
 
     form.addEventListener('submit', function(event) {
-      event.preventDefault(); // Stop l'envoi du formulaire
+      event.preventDefault();
       confirmationMessage.style.display = 'block';
-      form.reset(); // Vide les champs
+      form.reset();
     });
   </script>
 </body>
+
 
 </html>
