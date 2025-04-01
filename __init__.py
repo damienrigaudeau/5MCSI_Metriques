@@ -36,12 +36,10 @@ def mongraphique():
 def exercice4():
     return render_template("histogramme.html")
 
-# Route qui sert la page HTML du graphique des commits
 @app.route('/commits/')
 def graph_commits():
     return render_template('commits.html')
 
-# Route qui fournit les donnÃ©es JSON (sans authentification)
 @app.route('/commits-data/')
 def commits_data():
     try:
