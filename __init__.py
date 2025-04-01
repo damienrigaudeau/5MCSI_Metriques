@@ -36,18 +36,17 @@ def mongraphique():
 def exercice4():
     return render_template("histogramme.html")
 
+# Route qui sert la page HTML du graphique des commits
 @app.route('/commits/')
 def graph_commits():
     return render_template('commits.html')
 
-# Route qui fournit les données JSON des commits
-from urllib.request import Request  # à ajouter en haut si pas encore là
-
+# Route qui fournit les donnÃ©es JSON (sans authentification)
 @app.route('/commits-data/')
 def commits_data():
     try:
-        req = Request('https://api.github.com/repos/OpenRSI/Exo_Java_BDD_2023', headers=headers)
-        response = urlopen(req)
+        url = 'https://api.github.com/repos/Makrix78/5MCSI_Metriques/commits'
+        response = urlopen(url)
         raw_data = response.read()
         data = json.loads(raw_data.decode('utf-8'))
 
